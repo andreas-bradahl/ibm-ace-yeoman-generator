@@ -1,0 +1,14 @@
+{
+  "name": "generator-ace",
+  "version": "0.1.0",
+  "description": "Generator for scaffolding IBM App Connect Enterprise applications.",
+  "files": [
+    "generators"
+  ],
+  "keywords": [
+    "yeoman-generator"
+  ],
+  "dependencies": {
+    "yeoman-generator": "^1.1.1"
+  }
+}
