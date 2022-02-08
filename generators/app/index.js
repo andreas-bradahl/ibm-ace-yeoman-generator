@@ -28,7 +28,12 @@ module.exports = class extends Generator {
         this.answers = await this.prompt([
             {
                 type: "input",
-                name: "name",
+                name: "repoName",
+                message: "What is the name of your Git repo?",
+            },
+            {
+                type: "input",
+                name: "projectName",
                 message: "What is the name of your ACE project?",
             },
             {
@@ -58,21 +63,48 @@ module.exports = class extends Generator {
         ])
     }
 
+    // This part creates file and directory structures
     writing() {
-        this.log("Project name:", this.answers.name)
+        this.log("Repo name:", this.answers.projectName)
+        this.log("Application name:", this.answers.projectName)
         this.log("Uses M3:", this.answers.m3)
         this.log("Libraries: ", this.answers.libraries)
 
         this.log("Destination root: ", this.destinationRoot())
-        this.log("Destination path: ", this.destinationPath(this.answers.name))
+        this.log("Destination path: ", this.destinationPath(this.answers.repoName))
 
         this.log("Source root: ", this.sourceRoot())
-        this.log(".project file: ", this.templatePath('.project'))
+        this.log(".project file: ", this.templatePath('ace-app/.project'))
 
+        // Copy .project file
         this.fs.copyTpl(
-            this.templatePath('.project'),
-            this.destinationPath(this.answers.name + '/.project'),
-            { projectName: this.answers.name }
+            this.templatePath('ace-app/projects/project-folder/.project'),
+            this.destinationPath(this.answers.repoName + '/projects/' + this.answers.projectName + '/.project'),
+            { projectName: this.answers.projectName }
+        )
+
+        // Create local override
+        this.fs.copyTpl(
+            this.templatePath('ace-app/config/bar_overrides/repo_name.env.properties'),
+            this.destinationPath(this.answers.repoName + '/config/local/bar_overrides/' + this.answers.projectName + '.local.properties'),
+        )
+
+        // Create QA override
+        this.fs.copyTpl(
+            this.templatePath('ace-app/config/bar_overrides/repo_name.env.properties'),
+            this.destinationPath(this.answers.repoName + '/config/qa/bar_overrides/' + this.answers.projectName + '.qa.properties')
+        )
+
+        // Create prod override
+        this.fs.copyTpl(
+            this.templatePath('ace-app/config/bar_overrides/repo_name.env.properties'),
+            this.destinationPath(this.answers.repoName + '/config/prod/bar_overrides/' + this.answers.projectName + '.prod.properties')
+        )
+
+        // Create tests folder and ReadyAPI project file
+        this.fs.copyTpl(
+            this.templatePath('ace-app/tests/testproject-readyapi-project.xml'),
+            this.destinationPath(this.answers.repoName + '/tests/' + this.answers.projectName + '-readyapi-project.xml')
         )
     }
 
